@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Study Portal - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center">
+    <div class="py-3">
+        <span class="badge bg-white text-primary px-3 py-2 rounded-pill fw-bold mb-3 shadow-sm">
+            <i class="bi bi-stars me-1"></i> Centralized Academic Management
+        </span>
+        <h1 class="hero-title mb-3">Student Study Portal</h1>
+        <p class="hero-subtitle mx-auto mb-4">
+            Your centralized platform for smarter and organized learning. Manage academic notes, track pending homework, organize your daily study tasks, and access instant research tools all in one single place.
+        </p>
+        
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg px-4 fw-semibold text-primary shadow">
+                    <i class="bi bi-speedometer2 me-2"></i> Go to Dashboard
+                </a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg px-4 fw-semibold text-primary shadow">
+                    <i class="bi bi-person-plus-fill me-2"></i> Get Started Free
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4 fw-semibold">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Login to Portal
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="mb-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-dark">Everything You Need To Excel</h2>
+        <p class="text-muted">Integrated study modules and productivity tools designed specifically for students</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- 1. Notes Management -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-custom h-100 p-3">
+                <div class="feature-icon-box bg-primary-subtle text-primary">
+                    <i class="bi bi-journal-richtext"></i>
+                </div>
+                <h5 class="fw-bold mb-2">📚 Notes Management</h5>
+                <p class="text-muted small flex-grow-1">Create, organize, categorize by subject, and search your academic lecture notes anytime.</p>
+                <a href="{% if user.is_authenticated %}{% url 'notes' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-sm btn-outline-primary mt-2">
+                    Open Notes <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. Homework Tracker -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-custom h-100 p-3">
+                <div class="feature-icon-box bg-danger-subtle text-danger">
+                    <i class="bi bi-journal-check"></i>
+                </div>
+                <h5 class="fw-bold mb-2">📝 Homework Tracker</h5>
+                <p class="text-muted small flex-grow-1">Keep track of upcoming assignments, due dates, subjects, and mark tasks completed.</p>
+                <a href="{% if user.is_authenticated %}{% url 'homework' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-sm btn-outline-danger mt-2">
+                    Open Homework <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 3. To-Do List -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-custom h-100 p-3">
+                <div class="feature-icon-box bg-success-subtle text-success">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+                <h5 class="fw-bold mb-2">✅ To-Do List</h5>
+                <p class="text-muted small flex-grow-1">Stay focused on daily study schedules and academic goals with an intuitive task manager.</p>
+                <a href="{% if user.is_authenticated %}{% url 'todo' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-sm btn-outline-success mt-2">
+                    Open To-Do <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 4. YouTube Video Search -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-custom h-100 p-3">
+                <div class="feature-icon-box bg-danger-subtle text-danger">
+                    <i class="bi bi-youtube"></i>
+                </div>
+                <h5 class="fw-bold mb-2">🎥 YouTube Search</h5>
+                <p class="text-muted small flex-grow-1">Search educational video tutorials, lecture series, and practical demonstrations directly.</p>
+                <a href="{% if user.is_authenticated %}{% url 'youtube' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-sm btn-outline-danger mt-2">
+                    Search Videos <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 5. Wikipedia Search -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-custom h-100 p-3">
+                <div class="feature-icon-box bg-secondary-subtle text-secondary">
+                    <i class="bi bi-wikipedia"></i>
+                </div>
+                <h5 class="fw-bold mb-2">📖 Wikipedia Search</h5>
+                <p class="text-muted small flex-grow-1">Quickly research concepts, scientific definitions, historical summaries, and references.</p>
+                <a href="{% if user.is_authenticated %}{% url 'wikipedia' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-sm btn-outline-secondary mt-2">
+                    Search Wikipedia <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 6. Dictionary -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-custom h-100 p-3">
+                <div class="feature-icon-box bg-info-subtle text-info">
+                    <i class="bi bi-book-half"></i>
+                </div>
+                <h5 class="fw-bold mb-2">📕 Dictionary</h5>
+                <p class="text-muted small flex-grow-1">Look up English word definitions, pronunciations, parts of speech, and usage examples.</p>
+                <a href="{% if user.is_authenticated %}{% url 'dictionary' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-sm btn-outline-info mt-2">
+                    Look Up Words <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 7. Academic Books -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-custom h-100 p-3">
+                <div class="feature-icon-box bg-warning-subtle text-warning">
+                    <i class="bi bi-bookmark-star-fill"></i>
+                </div>
+                <h5 class="fw-bold mb-2">📚 Academic Books</h5>
+                <p class="text-muted small flex-grow-1">Explore textbook recommendations, reference guides, author details, and Google previews.</p>
+                <a href="{% if user.is_authenticated %}{% url 'books' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-sm btn-outline-warning mt-2">
+                    Search Books <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 8. Unit Converter -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card card-custom h-100 p-3">
+                <div class="feature-icon-box bg-success-subtle text-success">
+                    <i class="bi bi-arrow-left-right"></i>
+                </div>
+                <h5 class="fw-bold mb-2">🔄 Unit Converter</h5>
+                <p class="text-muted small flex-grow-1">Convert length, weight, temperature, area, and volume units accurately in real-time.</p>
+                <a href="{% if user.is_authenticated %}{% url 'unit_converter' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-sm btn-outline-success mt-2">
+                    Convert Units <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

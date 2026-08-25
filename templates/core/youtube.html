@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}YouTube Search - Student Study Portal{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-youtube text-danger me-2"></i> YouTube Educational Search
+            </h2>
+            <p class="text-muted mb-0">Search video lectures, tutorials, and academic demonstrations on YouTube.</p>
+        </div>
+    </div>
+
+    <!-- Search Card -->
+    <div class="card card-custom p-4 mb-4">
+        <form method="get" action="{% url 'youtube' %}" class="row g-2">
+            <div class="col-md-9 col-lg-10">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" value="{{ query }}" required class="form-control border-start-0 ps-0" placeholder="e.g., Python Programming, Data Structures, Operating Systems, Machine Learning...">
+                </div>
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <button type="submit" class="btn btn-danger w-100 fw-semibold">
+                    <i class="bi bi-search me-1"></i> Search
+                </button>
+            </div>
+        </form>
+
+        <!-- Sample Topic Pills -->
+        <div class="d-flex align-items-center gap-2 mt-3 flex-wrap">
+            <small class="text-muted fw-semibold">Popular topics:</small>
+            <a href="{% url 'youtube' %}?q=Python+Programming+Tutorial" class="badge bg-light text-dark border text-decoration-none py-2 px-3">Python Tutorial</a>
+            <a href="{% url 'youtube' %}?q=Data+Structures+Algorithms" class="badge bg-light text-dark border text-decoration-none py-2 px-3">Data Structures</a>
+            <a href="{% url 'youtube' %}?q=Computer+Networks+Lectures" class="badge bg-light text-dark border text-decoration-none py-2 px-3">Computer Networks</a>
+            <a href="{% url 'youtube' %}?q=Database+Management+Systems" class="badge bg-light text-dark border text-decoration-none py-2 px-3">DBMS</a>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    {% if query %}
+        {% if result_data %}
+            {% if not result_data.configured %}
+                <!-- Unconfigured API Key Notice -->
+                <div class="card card-custom p-4 border-warning bg-warning-subtle text-dark">
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="bi bi-info-circle-fill text-warning fs-3 mt-1"></i>
+                        <div>
+                            <h5 class="fw-bold mb-1">YouTube API Key Not Configured</h5>
+                            <p class="mb-2">{{ result_data.error }}</p>
+                            <div class="small bg-white p-3 rounded border">
+                                <strong>How to configure:</strong>
+                                <ol class="mb-0 mt-1 ps-3">
+                                    <li>Obtain a free YouTube Data API v3 key from <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer">Google Cloud Console</a>.</li>
+                                    <li>Open your <code>.env</code> file in the project folder.</li>
+                                    <li>Set <code>YOUTUBE_API_KEY=your_actual_key_here</code> and restart the development server.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% elif result_data.error %}
+                <div class="alert alert-info d-flex align-items-center shadow-sm">
+                    <i class="bi bi-info-circle me-2 fs-5"></i>
+                    <div>{{ result_data.error }}</div>
+                </div>
+            {% elif result_data.videos %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">Search Results for "{{ query }}"</h5>
+                    <span class="badge bg-light text-dark border">{{ result_data.videos|length }} videos</span>
+                </div>
+
+                <div class="row g-4">
+                    {% for video in result_data.videos %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card card-custom h-100 overflow-hidden d-flex flex-column">
+                                {% if video.thumbnail %}
+                                    <div class="position-relative">
+                                        <img src="{{ video.thumbnail }}" class="card-img-top" alt="{{ video.title }}" style="height: 180px; object-fit: cover;">
+                                        <span class="position-absolute bottom-0 end-0 bg-dark text-white small px-2 py-1 m-2 rounded opacity-75">
+                                            <i class="bi bi-play-btn me-1"></i> Video
+                                        </span>
+                                    </div>
+                                {% endif %}
+                                <div class="card-body d-flex flex-column p-3">
+                                    <h6 class="fw-bold text-dark mb-2 line-clamp-2" title="{{ video.title }}">
+                                        {{ video.title|safe }}
+                                    </h6>
+                                    <div class="text-muted small mb-2">
+                                        <i class="bi bi-person-video me-1"></i> {{ video.channel_title }}
+                                        {% if video.published_at %} &bull; {{ video.published_at }}{% endif %}
+                                    </div>
+                                    {% if video.description %}
+                                        <p class="text-muted small flex-grow-1" style="font-size: 0.85rem; max-height: 60px; overflow: hidden;">
+                                            {{ video.description }}
+                                        </p>
+                                    {% endif %}
+                                    <div class="pt-2 border-top mt-auto">
+                                        <a href="{{ video.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-danger w-100 fw-semibold">
+                                            <i class="bi bi-play-fill me-1"></i> Watch on YouTube
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <div class="card card-custom p-5 text-center text-muted">
+            <i class="bi bi-youtube text-danger display-4 mb-3"></i>
+            <h4 class="fw-bold text-dark">Find High-Quality Educational Videos</h4>
+            <p class="mx-auto" style="max-width: 500px;">
+                Enter an academic concept, lecture topic, or subject name above to search educational content.
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

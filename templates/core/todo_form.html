@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} - Student Study Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card card-custom p-4 p-md-5">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1">
+                        <i class="bi bi-check2-square text-success me-2"></i> {{ action }}
+                    </h3>
+                    <p class="text-muted small mb-0">Plan your revision sessions, study schedules, or project goals.</p>
+                </div>
+                <a href="{% url 'todo' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Back to To-Do
+                </a>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 small">
+                        {% for error in form.non_field_errors %}
+                            <div><i class="bi bi-exclamation-circle me-1"></i> {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Title -->
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold text-dark">Task Title *</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.title.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Due Date -->
+                <div class="mb-3">
+                    <label for="{{ form.due_date.id_for_label }}" class="form-label fw-semibold text-dark">Target / Due Date (Optional)</label>
+                    {{ form.due_date }}
+                    {% if form.due_date.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.due_date.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold text-dark">Description / Checklist (Optional)</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.description.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Completed Checkbox (when editing) -->
+                {% if 'Edit' in action %}
+                    <div class="form-check mb-4">
+                        {{ form.completed }}
+                        <label class="form-check-label fw-semibold" for="{{ form.completed.id_for_label }}">
+                            Mark this task as completed
+                        </label>
+                    </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{% url 'todo' %}" class="btn btn-light border px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary-custom px-4">
+                        <i class="bi bi-check-circle me-1"></i> Save Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

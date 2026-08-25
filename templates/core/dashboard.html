@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Student Study Portal{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <!-- Welcome Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                Welcome, <span class="text-primary">{{ user.username }}</span>! 👋
+            </h2>
+            <p class="text-muted mb-0">Here is a quick snapshot of your academic progress and study utilities.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'notes_add' %}" class="btn btn-primary-custom btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> New Note
+            </a>
+            <a href="{% url 'homework_add' %}" class="btn btn-outline-custom btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> Add Homework
+            </a>
+            <a href="{% url 'todo_add' %}" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> Add Task
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Statistics Counters -->
+    <div class="row g-3 mb-4">
+        <!-- Total Notes -->
+        <div class="col-6 col-md-4 col-lg">
+            <div class="stat-card">
+                <div>
+                    <span class="text-muted small fw-semibold">Total Notes</span>
+                    <h3 class="fw-bold mb-0 text-primary">{{ total_notes }}</h3>
+                </div>
+                <div class="stat-icon bg-primary-subtle text-primary">
+                    <i class="bi bi-journal-text"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Homework -->
+        <div class="col-6 col-md-4 col-lg">
+            <div class="stat-card">
+                <div>
+                    <span class="text-muted small fw-semibold">Pending Homework</span>
+                    <h3 class="fw-bold mb-0 text-danger">{{ pending_homework }}</h3>
+                </div>
+                <div class="stat-icon bg-danger-subtle text-danger">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Homework -->
+        <div class="col-6 col-md-4 col-lg">
+            <div class="stat-card">
+                <div>
+                    <span class="text-muted small fw-semibold">Completed HW</span>
+                    <h3 class="fw-bold mb-0 text-success">{{ completed_homework }}</h3>
+                </div>
+                <div class="stat-icon bg-success-subtle text-success">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Tasks -->
+        <div class="col-6 col-md-4 col-lg">
+            <div class="stat-card">
+                <div>
+                    <span class="text-muted small fw-semibold">Pending Tasks</span>
+                    <h3 class="fw-bold mb-0 text-warning">{{ pending_tasks }}</h3>
+                </div>
+                <div class="stat-icon bg-warning-subtle text-warning">
+                    <i class="bi bi-list-task"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Tasks -->
+        <div class="col-12 col-md-4 col-lg">
+            <div class="stat-card">
+                <div>
+                    <span class="text-muted small fw-semibold">Completed Tasks</span>
+                    <h3 class="fw-bold mb-0 text-info">{{ completed_tasks }}</h3>
+                </div>
+                <div class="stat-icon bg-info-subtle text-info">
+                    <i class="bi bi-check-all"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Tools Grid -->
+    <div class="mb-4">
+        <h5 class="fw-bold text-dark mb-3">Study Utilities & Tools</h5>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <a href="{% url 'notes' %}" class="card card-dashboard-action p-3 bg-white h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="feature-icon-box bg-primary-subtle text-primary mb-0" style="width:46px;height:46px;font-size:1.3rem;">
+                            <i class="bi bi-journal-richtext"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Notes</h6>
+                            <small class="text-muted">{{ total_notes }} created</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <a href="{% url 'homework' %}" class="card card-dashboard-action p-3 bg-white h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="feature-icon-box bg-danger-subtle text-danger mb-0" style="width:46px;height:46px;font-size:1.3rem;">
+                            <i class="bi bi-journal-check"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Homework</h6>
+                            <small class="text-muted">{{ pending_homework }} pending</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <a href="{% url 'todo' %}" class="card card-dashboard-action p-3 bg-white h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="feature-icon-box bg-success-subtle text-success mb-0" style="width:46px;height:46px;font-size:1.3rem;">
+                            <i class="bi bi-check2-square"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">To-Do List</h6>
+                            <small class="text-muted">{{ pending_tasks }} active</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <a href="{% url 'youtube' %}" class="card card-dashboard-action p-3 bg-white h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="feature-icon-box bg-danger-subtle text-danger mb-0" style="width:46px;height:46px;font-size:1.3rem;">
+                            <i class="bi bi-youtube"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">YouTube</h6>
+                            <small class="text-muted">Video search</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <a href="{% url 'wikipedia' %}" class="card card-dashboard-action p-3 bg-white h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="feature-icon-box bg-secondary-subtle text-secondary mb-0" style="width:46px;height:46px;font-size:1.3rem;">
+                            <i class="bi bi-wikipedia"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Wikipedia</h6>
+                            <small class="text-muted">Quick research</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <a href="{% url 'dictionary' %}" class="card card-dashboard-action p-3 bg-white h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="feature-icon-box bg-info-subtle text-info mb-0" style="width:46px;height:46px;font-size:1.3rem;">
+                            <i class="bi bi-book-half"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Dictionary</h6>
+                            <small class="text-muted">Word meanings</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <a href="{% url 'books' %}" class="card card-dashboard-action p-3 bg-white h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="feature-icon-box bg-warning-subtle text-warning mb-0" style="width:46px;height:46px;font-size:1.3rem;">
+                            <i class="bi bi-bookmark-star-fill"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Books</h6>
+                            <small class="text-muted">Google Books</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <a href="{% url 'unit_converter' %}" class="card card-dashboard-action p-3 bg-white h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="feature-icon-box bg-success-subtle text-success mb-0" style="width:46px;height:46px;font-size:1.3rem;">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">Converter</h6>
+                            <small class="text-muted">Unit conversion</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Tasks & Urgent Homework Section -->
+    <div class="row g-4">
+        <!-- Upcoming Homework -->
+        <div class="col-lg-6">
+            <div class="card card-custom h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-journal-check text-danger me-2"></i> Upcoming Homework
+                    </h5>
+                    <a href="{% url 'homework' %}" class="text-primary small fw-semibold text-decoration-none">
+                        View All ({{ pending_homework }}) &rarr;
+                    </a>
+                </div>
+
+                {% if urgent_homework %}
+                    <div class="list-group list-group-flush">
+                        {% for hw in urgent_homework %}
+                            <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-start border-bottom">
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-dark">{{ hw.title }}</h6>
+                                    <div class="small text-muted mb-1">
+                                        <span class="badge bg-light text-dark border me-1">{{ hw.subject }}</span>
+                                        Due: 
+                                        <span class="{% if hw.is_overdue %}text-danger fw-bold{% else %}text-muted{% endif %}">
+                                            {{ hw.due_date|date:"M d, Y" }}
+                                            {% if hw.is_overdue %} (Overdue!){% endif %}
+                                        </span>
+                                    </div>
+                                    {% if hw.description %}
+                                        <p class="text-muted small mb-0 text-truncate" style="max-width: 320px;">{{ hw.description }}</p>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <a href="{% url 'homework_toggle' hw.id %}" class="btn btn-sm btn-outline-success" title="Mark as Completed">
+                                        <i class="bi bi-check-lg"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-emoji-smile fs-1 text-success d-block mb-2"></i>
+                        <p class="mb-2">No pending homework assignments!</p>
+                        <a href="{% url 'homework_add' %}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-plus-lg me-1"></i> Add Homework
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Pending Study Tasks -->
+        <div class="col-lg-6">
+            <div class="card card-custom h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-check2-square text-success me-2"></i> Study To-Do List
+                    </h5>
+                    <a href="{% url 'todo' %}" class="text-primary small fw-semibold text-decoration-none">
+                        View All ({{ pending_tasks }}) &rarr;
+                    </a>
+                </div>
+
+                {% if pending_todo_list %}
+                    <div class="list-group list-group-flush">
+                        {% for task in pending_todo_list %}
+                            <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center border-bottom">
+                                <div class="d-flex align-items-center gap-2">
+                                    <a href="{% url 'todo_toggle' task.id %}" class="btn btn-sm btn-outline-secondary rounded-circle p-1" style="width: 28px; height: 28px;" title="Mark Done">
+                                        <i class="bi bi-check"></i>
+                                    </a>
+                                    <div>
+                                        <h6 class="fw-semibold mb-0 text-dark">{{ task.title }}</h6>
+                                        {% if task.due_date %}
+                                            <small class="{% if task.is_overdue %}text-danger fw-bold{% else %}text-muted{% endif %}">
+                                                Due: {{ task.due_date|date:"M d, Y" }}
+                                                {% if task.is_overdue %} (Overdue!){% endif %}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <a href="{% url 'todo_edit' task.id %}" class="btn btn-sm btn-link text-muted p-0">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-check-circle fs-1 text-success d-block mb-2"></i>
+                        <p class="mb-2">All caught up! No pending study tasks.</p>
+                        <a href="{% url 'todo_add' %}" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-plus-lg me-1"></i> Add Task
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

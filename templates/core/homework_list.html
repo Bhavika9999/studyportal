@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Homework Management - Student Study Portal{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-journal-check text-danger me-2"></i> Homework & Assignments
+            </h2>
+            <p class="text-muted mb-0">Track upcoming coursework, deadlines, practical submissions, and completed assignments.</p>
+        </div>
+        <a href="{% url 'homework_add' %}" class="btn btn-primary-custom">
+            <i class="bi bi-plus-lg me-1"></i> Add Homework
+        </a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="card card-custom p-3 mb-4">
+        <form method="get" action="{% url 'homework' %}" class="row g-2 align-items-center">
+            <div class="col-md-10">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" value="{{ query }}" class="form-control border-start-0 ps-0" placeholder="Search homework by title, subject, or description...">
+                </div>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary-custom w-100">Search</button>
+                {% if query %}
+                    <a href="{% url 'homework' %}" class="btn btn-outline-secondary" title="Clear Search">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Pending Homework Section -->
+    <div class="card card-custom p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0">
+                <i class="bi bi-hourglass-split text-danger me-2"></i> Pending Homework ({{ pending_homeworks|length }})
+            </h5>
+        </div>
+
+        {% if pending_homeworks %}
+            <div class="row g-3">
+                {% for hw in pending_homeworks %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 p-3 border {% if hw.is_overdue %}border-danger shadow-sm{% else %}border-light-subtle shadow-sm{% endif %} rounded-3 bg-white">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                    {{ hw.subject }}
+                                </span>
+                                {% if hw.is_overdue %}
+                                    <span class="badge bg-danger text-white">Overdue</span>
+                                {% else %}
+                                    <span class="badge bg-light text-muted border">Pending</span>
+                                {% endif %}
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-1">{{ hw.title }}</h5>
+                            
+                            <div class="small mb-2">
+                                <span class="fw-semibold {% if hw.is_overdue %}text-danger{% else %}text-muted{% endif %}">
+                                    <i class="bi bi-calendar-event me-1"></i> Due: {{ hw.due_date|date:"M d, Y" }}
+                                </span>
+                            </div>
+
+                            {% if hw.description %}
+                                <p class="text-muted small mb-3 flex-grow-1" style="white-space: pre-line;">{{ hw.description }}</p>
+                            {% else %}
+                                <p class="text-muted small mb-3 fst-italic flex-grow-1">No additional instructions provided.</p>
+                            {% endif %}
+
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
+                                <a href="{% url 'homework_toggle' hw.id %}" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-check-lg me-1"></i> Mark Done
+                                </a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'homework_edit' hw.id %}" class="btn btn-sm btn-outline-primary" title="Edit Homework">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'homework_delete' hw.id %}" class="btn btn-sm btn-outline-danger" title="Delete Homework">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-check2-circle fs-1 text-success d-block mb-2"></i>
+                <p class="mb-2">No pending homework assignments found!</p>
+                <a href="{% url 'homework_add' %}" class="btn btn-sm btn-primary-custom">
+                    <i class="bi bi-plus-lg me-1"></i> Add New Assignment
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Completed Homework Section -->
+    <div class="card card-custom p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0">
+                <i class="bi bi-check-circle-fill text-success me-2"></i> Completed Homework ({{ completed_homeworks|length }})
+            </h5>
+        </div>
+
+        {% if completed_homeworks %}
+            <div class="row g-3">
+                {% for hw in completed_homeworks %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 p-3 border border-success-subtle rounded-3 bg-light-subtle">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                    {{ hw.subject }}
+                                </span>
+                                <span class="badge bg-success text-white">Completed</span>
+                            </div>
+
+                            <h5 class="fw-bold text-muted completed-item mb-1">{{ hw.title }}</h5>
+                            
+                            <div class="small text-muted mb-2">
+                                <i class="bi bi-calendar-check me-1"></i> Was due: {{ hw.due_date|date:"M d, Y" }}
+                            </div>
+
+                            {% if hw.description %}
+                                <p class="text-muted small mb-3 flex-grow-1 text-truncate">{{ hw.description }}</p>
+                            {% endif %}
+
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
+                                <a href="{% url 'homework_toggle' hw.id %}" class="btn btn-sm btn-outline-secondary" title="Mark as Pending">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+                                </a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'homework_edit' hw.id %}" class="btn btn-sm btn-outline-primary" title="Edit Homework">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'homework_delete' hw.id %}" class="btn btn-sm btn-outline-danger" title="Delete Homework">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted small mb-0 fst-italic">Completed assignments will appear here once marked as done.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

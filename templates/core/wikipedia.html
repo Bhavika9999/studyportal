@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Wikipedia Search - Student Study Portal{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-wikipedia text-dark me-2"></i> Wikipedia Concept Search
+            </h2>
+            <p class="text-muted mb-0">Look up verified academic summaries, historical milestones, scientific concepts, and biographies.</p>
+        </div>
+    </div>
+
+    <!-- Search Card -->
+    <div class="card card-custom p-4 mb-4">
+        <form method="get" action="{% url 'wikipedia' %}" class="row g-2">
+            <div class="col-md-9 col-lg-10">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" value="{{ query }}" required class="form-control border-start-0 ps-0" placeholder="e.g., Artificial Intelligence, Quantum Computing, Alan Turing, Thermodynamics...">
+                </div>
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <button type="submit" class="btn btn-dark w-100 fw-semibold">
+                    <i class="bi bi-search me-1"></i> Search
+                </button>
+            </div>
+        </form>
+
+        <!-- Sample Topic Pills -->
+        <div class="d-flex align-items-center gap-2 mt-3 flex-wrap">
+            <small class="text-muted fw-semibold">Try searching:</small>
+            <a href="{% url 'wikipedia' %}?q=Artificial+Intelligence" class="badge bg-light text-dark border text-decoration-none py-2 px-3">Artificial Intelligence</a>
+            <a href="{% url 'wikipedia' %}?q=Operating+System" class="badge bg-light text-dark border text-decoration-none py-2 px-3">Operating System</a>
+            <a href="{% url 'wikipedia' %}?q=Relational+Database" class="badge bg-light text-dark border text-decoration-none py-2 px-3">Relational Database</a>
+            <a href="{% url 'wikipedia' %}?q=Computer+Network" class="badge bg-light text-dark border text-decoration-none py-2 px-3">Computer Network</a>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    {% if query %}
+        {% if result_data %}
+            {% if result_data.error %}
+                <div class="card card-custom p-4 text-center">
+                    <i class="bi bi-info-circle text-muted display-5 mb-2"></i>
+                    <h5 class="fw-bold text-dark">{{ result_data.error }}</h5>
+                    <p class="text-muted small mb-0">Try checking the spelling or searching for a related broader term.</p>
+                </div>
+            {% elif result_data.found %}
+                <div class="card card-custom p-4 p-md-5">
+                    <div class="row g-4 align-items-start">
+                        {% if result_data.thumbnail %}
+                            <div class="col-md-4 text-center">
+                                <img src="{{ result_data.thumbnail }}" alt="{{ result_data.title }}" class="img-fluid rounded-3 shadow-sm border mb-2" style="max-height: 280px; object-fit: contain;">
+                                <div class="small text-muted fst-italic">Wikipedia Media</div>
+                            </div>
+                            <div class="col-md-8">
+                        {% else %}
+                            <div class="col-12">
+                        {% endif %}
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="badge bg-secondary text-white px-2 py-1">Wikipedia Article</span>
+                                <span class="text-muted small">&bull; Free Encyclopedia</span>
+                            </div>
+                            
+                            <h2 class="fw-bold text-dark mb-3">{{ result_data.title }}</h2>
+                            
+                            <div class="lead fs-6 text-secondary mb-4" style="line-height: 1.8;">
+                                {{ result_data.summary }}
+                            </div>
+
+                            {% if result_data.url %}
+                                <div>
+                                    <a href="{{ result_data.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i> Read Full Article on Wikipedia
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <div class="card card-custom p-5 text-center text-muted">
+            <i class="bi bi-wikipedia text-dark display-4 mb-3"></i>
+            <h4 class="fw-bold text-dark">Instant Wikipedia Knowledge Lookup</h4>
+            <p class="mx-auto" style="max-width: 500px;">
+                Enter any academic, technical, or scientific topic above to read instant summaries and references.
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

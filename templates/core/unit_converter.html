@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Unit Converter - Student Study Portal{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-arrow-left-right text-success me-2"></i> Academic Unit Converter
+            </h2>
+            <p class="text-muted mb-0">Convert units of Length, Weight, Temperature, Area, and Volume for your lab reports and calculations.</p>
+        </div>
+    </div>
+
+    <!-- Converter Card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-custom p-4 p-md-5">
+                <!-- Category Tabs -->
+                <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-3" id="categoryTabs">
+                    <li class="nav-item">
+                        <button class="nav-link py-2 fw-semibold {% if category == 'length' or not category %}active{% endif %}" type="button" data-cat="length">
+                            <i class="bi bi-rulers me-1"></i> Length
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-2 fw-semibold {% if category == 'weight' %}active{% endif %}" type="button" data-cat="weight">
+                            <i class="bi bi-speedometer me-1"></i> Weight
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-2 fw-semibold {% if category == 'temperature' %}active{% endif %}" type="button" data-cat="temperature">
+                            <i class="bi bi-thermometer-half me-1"></i> Temp
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-2 fw-semibold {% if category == 'area' %}active{% endif %}" type="button" data-cat="area">
+                            <i class="bi bi-bounding-box me-1"></i> Area
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-2 fw-semibold {% if category == 'volume' %}active{% endif %}" type="button" data-cat="volume">
+                            <i class="bi bi-droplet-half me-1"></i> Volume
+                        </button>
+                    </li>
+                </ul>
+
+                <form method="get" action="{% url 'unit_converter' %}" id="converterForm">
+                    <input type="hidden" name="category" id="categoryInput" value="{{ category|default:'length' }}">
+
+                    <div class="row g-3 mb-4">
+                        <!-- Input Value -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-dark">Enter Value</label>
+                            <input type="number" step="any" name="input_value" id="inputValue" value="{{ input_value|default:'1' }}" required class="form-control form-control-lg" placeholder="Enter number...">
+                        </div>
+
+                        <!-- From Unit -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark">From Unit</label>
+                            <select name="from_unit" id="fromUnit" class="form-select form-select-lg"></select>
+                        </div>
+
+                        <!-- To Unit -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark">To Unit</label>
+                            <select name="to_unit" id="toUnit" class="form-select form-select-lg"></select>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-success btn-lg fw-semibold">
+                            <i class="bi bi-arrow-left-right me-1"></i> Convert Value
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Result Box -->
+                <div id="resultBox" class="p-4 rounded-3 text-center border bg-light-subtle {% if not result and not error %}d-none{% endif %}">
+                    {% if error %}
+                        <div class="text-danger fw-semibold">
+                            <i class="bi bi-exclamation-triangle me-1"></i> {{ error }}
+                        </div>
+                    {% elif result is not None %}
+                        <div class="text-muted small mb-1 fw-medium text-uppercase">Conversion Result</div>
+                        <div class="fs-3 fw-bold text-dark">
+                            <span id="displayInput">{{ input_value }}</span> <span id="displayFrom" class="text-muted fs-5">{{ from_unit }}</span>
+                            =
+                            <span id="displayResult" class="text-success">{{ result }}</span> <span id="displayTo" class="text-muted fs-5">{{ to_unit }}</span>
+                        </div>
+                    {% else %}
+                        <div class="text-muted small mb-1 fw-medium text-uppercase">Conversion Result</div>
+                        <div class="fs-3 fw-bold text-dark">
+                            <span id="displayInput"></span> <span id="displayFrom" class="text-muted fs-5"></span>
+                            =
+                            <span id="displayResult" class="text-success"></span> <span id="displayTo" class="text-muted fs-5"></span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const unitData = {
+    length: ['meter', 'kilometer', 'centimeter', 'millimeter', 'mile', 'foot', 'inch'],
+    weight: ['gram', 'kilogram', 'milligram', 'pound', 'ounce'],
+    temperature: ['celsius', 'fahrenheit', 'kelvin'],
+    area: ['square meter', 'square kilometer', 'square foot', 'square inch', 'acre'],
+    volume: ['liter', 'milliliter', 'cubic meter', 'gallon (US)']
+};
+
+const conversionFactors = {
+    length: {
+        'meter': 1.0,
+        'kilometer': 1000.0,
+        'centimeter': 0.01,
+        'millimeter': 0.001,
+        'mile': 1609.344,
+        'foot': 0.3048,
+        'inch': 0.0254
+    },
+    weight: {
+        'gram': 1.0,
+        'kilogram': 1000.0,
+        'milligram': 0.001,
+        'pound': 453.59237,
+        'ounce': 28.34952
+    },
+    area: {
+        'square meter': 1.0,
+        'square kilometer': 1000000.0,
+        'square foot': 0.092903,
+        'square inch': 0.00064516,
+        'acre': 4046.86
+    },
+    volume: {
+        'liter': 1.0,
+        'milliliter': 0.001,
+        'cubic meter': 1000.0,
+        'gallon (US)': 3.78541
+    }
+};
+
+const currentCat = "{{ category|default:'length' }}";
+const initialFrom = "{{ from_unit }}";
+const initialTo = "{{ to_unit }}";
+
+function populateUnits(category, selectedFrom = '', selectedTo = '') {
+    const units = unitData[category] || [];
+    const fromSelect = document.getElementById('fromUnit');
+    const toSelect = document.getElementById('toUnit');
+
+    fromSelect.innerHTML = '';
+    toSelect.innerHTML = '';
+
+    units.forEach((unit, idx) => {
+        const optFrom = document.createElement('option');
+        optFrom.value = unit;
+        optFrom.textContent = unit.charAt(0).toUpperCase() + unit.slice(1);
+        if (selectedFrom ? unit === selectedFrom : idx === 0) {
+            optFrom.selected = true;
+        }
+        fromSelect.appendChild(optFrom);
+
+        const optTo = document.createElement('option');
+        optTo.value = unit;
+        optTo.textContent = unit.charAt(0).toUpperCase() + unit.slice(1);
+        if (selectedTo ? unit === selectedTo : (units.length > 1 ? idx === 1 : idx === 0)) {
+            optTo.selected = true;
+        }
+        toSelect.appendChild(optTo);
+    });
+}
+
+function calculateLive() {
+    const cat = document.getElementById('categoryInput').value;
+    const inputVal = parseFloat(document.getElementById('inputValue').value);
+    const from = document.getElementById('fromUnit').value;
+    const to = document.getElementById('toUnit').value;
+
+    if (isNaN(inputVal)) return;
+
+    let res = 0;
+    if (cat === 'temperature') {
+        if (from === to) res = inputVal;
+        else if (from === 'celsius' && to === 'fahrenheit') res = (inputVal * 9/5) + 32;
+        else if (from === 'celsius' && to === 'kelvin') res = inputVal + 273.15;
+        else if (from === 'fahrenheit' && to === 'celsius') res = (inputVal - 32) * 5/9;
+        else if (from === 'fahrenheit' && to === 'kelvin') res = (inputVal - 32) * 5/9 + 273.15;
+        else if (from === 'kelvin' && to === 'celsius') res = inputVal - 273.15;
+        else if (from === 'kelvin' && to === 'fahrenheit') res = (inputVal - 273.15) * 9/5 + 32;
+    } else if (conversionFactors[cat]) {
+        const table = conversionFactors[cat];
+        if (table[from] && table[to]) {
+            const baseVal = inputVal * table[from];
+            res = baseVal / table[to];
+        }
+    }
+
+    const rounded = Math.round(res * 1000000) / 1000000;
+    const resultBox = document.getElementById('resultBox');
+    resultBox.classList.remove('d-none');
+    document.getElementById('displayInput').textContent = inputVal;
+    document.getElementById('displayFrom').textContent = from;
+    document.getElementById('displayResult').textContent = rounded;
+    document.getElementById('displayTo').textContent = to;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    populateUnits(currentCat, initialFrom, initialTo);
+
+    document.querySelectorAll('#categoryTabs button').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            document.querySelectorAll('#categoryTabs button').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const cat = tab.getAttribute('data-cat');
+            document.getElementById('categoryInput').value = cat;
+            populateUnits(cat);
+            calculateLive();
+        });
+    });
+
+    document.getElementById('inputValue').addEventListener('input', calculateLive);
+    document.getElementById('fromUnit').addEventListener('change', calculateLive);
+    document.getElementById('toUnit').addEventListener('change', calculateLive);
+});
+</script>
+{% endblock %}

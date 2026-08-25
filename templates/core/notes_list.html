@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Notes Management - Student Study Portal{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-journal-text text-primary me-2"></i> Study Notes
+            </h2>
+            <p class="text-muted mb-0">Organize and search your subject notes, lecture summaries, and revision material.</p>
+        </div>
+        <a href="{% url 'notes_add' %}" class="btn btn-primary-custom">
+            <i class="bi bi-plus-lg me-1"></i> Add New Note
+        </a>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="card card-custom p-3 mb-4">
+        <form method="get" action="{% url 'notes' %}" class="row g-2 align-items-center">
+            <div class="col-md-6 col-lg-7">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" value="{{ query }}" class="form-control border-start-0 ps-0" placeholder="Search notes by title, subject, or content...">
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-3">
+                <select name="subject" class="form-select">
+                    <option value="">All Subjects</option>
+                    {% for subj in subjects %}
+                        <option value="{{ subj }}" {% if subject_filter == subj %}selected{% endif %}>{{ subj }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2 col-lg-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary-custom w-100">
+                    Filter
+                </button>
+                {% if query or subject_filter %}
+                    <a href="{% url 'notes' %}" class="btn btn-outline-secondary" title="Clear Filters">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Notes Grid -->
+    {% if notes %}
+        <div class="row g-4">
+            {% for note in notes %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-custom h-100 d-flex flex-column p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                {{ note.subject }}
+                            </span>
+                            <small class="text-muted">{{ note.updated_at|date:"M d, Y" }}</small>
+                        </div>
+                        
+                        <h5 class="fw-bold text-dark mb-2">{{ note.title }}</h5>
+                        
+                        <div class="text-muted small mb-3 flex-grow-1" style="white-space: pre-line; max-height: 150px; overflow-y: auto;">
+                            {{ note.content }}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#noteModal{{ note.id }}">
+                                <i class="bi bi-arrows-fullscreen me-1"></i> View Full
+                            </button>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'notes_edit' note.id %}" class="btn btn-sm btn-outline-primary" title="Edit Note">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'notes_delete' note.id %}" class="btn btn-sm btn-outline-danger" title="Delete Note">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Note Modal -->
+                <div class="modal fade" id="noteModal{{ note.id }}" tabindex="-1" aria-labelledby="noteModalLabel{{ note.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0 shadow">
+                            <div class="modal-header border-bottom">
+                                <div>
+                                    <span class="badge bg-primary-subtle text-primary mb-1">{{ note.subject }}</span>
+                                    <h5 class="modal-title fw-bold text-dark" id="noteModalLabel{{ note.id }}">{{ note.title }}</h5>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-4" style="white-space: pre-wrap; font-family: inherit; line-height: 1.6;">
+                                {{ note.content }}
+                            </div>
+                            <div class="modal-footer border-top bg-light">
+                                <small class="text-muted me-auto">
+                                    Created: {{ note.created_at|date:"M d, Y H:i" }} &bull; Updated: {{ note.updated_at|date:"M d, Y H:i" }}
+                                </small>
+                                <a href="{% url 'notes_edit' note.id %}" class="btn btn-sm btn-primary-custom">
+                                    <i class="bi bi-pencil me-1"></i> Edit Note
+                                </a>
+                                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card card-custom text-center py-5 p-4">
+            <div class="mb-3">
+                <i class="bi bi-journal-x fs-1 text-muted"></i>
+            </div>
+            <h4 class="fw-bold text-dark">No Notes Found</h4>
+            {% if query or subject_filter %}
+                <p class="text-muted">No notes match your search/filter criteria. Try clearing filters or search terms.</p>
+                <div>
+                    <a href="{% url 'notes' %}" class="btn btn-outline-secondary btn-sm">Clear Filters</a>
+                </div>
+            {% else %}
+                <p class="text-muted">You haven't created any lecture notes yet. Create your first note now!</p>
+                <div>
+                    <a href="{% url 'notes_add' %}" class="btn btn-primary-custom btn-sm">
+                        <i class="bi bi-plus-lg me-1"></i> Create First Note
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
