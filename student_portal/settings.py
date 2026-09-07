@@ -21,10 +21,21 @@ SECRET_KEY = os.getenv(
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
+DEBUG = os.getenv('DEBUG', 'False' if os.getenv('VERCEL') else 'True').lower() in ('true', '1', 't')
 
 allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost')
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',') if host.strip()]
+
+if os.getenv('VERCEL'):
+    vercel_hosts = [
+        os.getenv('VERCEL_URL', ''),
+        os.getenv('VERCEL_BRANCH_URL', ''),
+        os.getenv('VERCEL_PROJECT_PRODUCTION_URL', ''),
+    ]
+    for vercel_host in vercel_hosts:
+        if vercel_host:
+            ALLOWED_HOSTS.append(vercel_host.split(':')[0])
+    CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if host not in ('127.0.0.1', 'localhost')]
 
 # External API Keys
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY', '')
