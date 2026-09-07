@@ -2,6 +2,6 @@ import os
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'student_portal.settings')
 
-from django.core.wsgi import get_wsgi_application
+from student_portal.wsgi import application
 
-app = get_wsgi_application()
+app = application
